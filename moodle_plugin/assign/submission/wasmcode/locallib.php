@@ -50,7 +50,7 @@ class assign_submission_wasmcode extends assign_submission_plugin {
         return true;
     }
 
-    public function get_form_elements_eval($submission, MoodleQuickForm $mform, stdClass $data, $formcontext) {
+    public function get_form_elements($submission, MoodleQuickForm $mform, stdClass $data) {
         global $DB, $PAGE;
 
         $current_code = '';
@@ -83,6 +83,12 @@ class assign_submission_wasmcode extends assign_submission_plugin {
         ]);
 
         return true;
+    }
+
+    public function is_empty(stdClass $submission) {
+        global $DB;
+        $record = $DB->get_record('assignsubmission_wasmcode', ['submission' => $submission->id]);
+        return empty($record) || empty(trim($record->source_code));
     }
 
     public function save(stdClass $submission, stdClass $data) {
