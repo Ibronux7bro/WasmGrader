@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "name": "Standard Positive",
+    "input": "15 25\n",
+    "expected_output": "40\n",
+    "is_hidden": false,
+    "weight": 20.0,
+    "test_type": "standard"
+  },
+  {
+    "id": 2,
+    "name": "Negative Addition",
+    "input": "-50 30\n",
+    "expected_output": "-20\n",
+    "is_hidden": false,
+    "weight": 20.0,
+    "test_type": "boundary"
+  },
+  {
+    "id": 3,
+    "name": "Both Negative",
+    "input": "-100 -200\n",
+    "expected_output": "-300\n",
+    "is_hidden": true,
+    "weight": 20.0,
+    "test_type": "standard"
+  },
+  {
+    "id": 4,
+    "name": "Zero Neutral",
+    "input": "0 0\n",
+    "expected_output": "0\n",
+    "is_hidden": true,
+    "weight": 20.0,
+    "test_type": "edge_case"
+  },
+  {
+    "id": 5,
+    "name": "Large Integers",
+    "input": "1000000 1000000\n",
+    "expected_output": "2000000\n",
+    "is_hidden": true,
+    "weight": 20.0,
+    "test_type": "large_input"
+  }
+]
