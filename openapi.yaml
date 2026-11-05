@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Moodle WASM Evaluator API
+  description: High-performance code sandboxing and parallel evaluation engine using WebAssembly and Wasmtime.
+  version: 0.1.0
+servers:
+  - url: http://localhost:8080
+    description: Local Development Server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              example:
+                status: healthy
+                service: moodle-wasm-evaluator
+                version: 0.1.0
+
+  /api/v1/evaluate:
+    post:
+      summary: Compile and evaluate student code against test cases in parallel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationRequest'
+      responses:
+        '200':
+          description: Evaluation completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluationResponse'
+        '400':
+          description: Bad request (e.g., unsupported language)
+
+  /api/v1/tests/generate:
+    post:
+      summary: Automatically generate assignment test cases using AI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIGenerateRequest'
+      responses:
+        '200':
+          description: Test cases generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIGenerateResponse'
+
+components:
+  schemas:
+    Language:
+      type: string
+      enum: [c, cpp, rust, python]
+
+    ExecutionLimits:
+      type: object
+      properties:
+        timeout_ms:
+          type: integer
+          default: 2000
+        memory_limit_mb:
+          type: integer
+          default: 64
+        max_output_bytes:
+          type: integer
+          default: 1048576
+
+    TestCase:
+      type: object
+      required: [id, input, expected_output]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        input:
+          type: string
+        expected_output:
+          type: string
+        is_hidden:
+          type: boolean
+          default: false
+        weight:
+          type: number
+          default: 10.0
+        test_type:
+          type: string
+          default: standard
+
+    EvaluationRequest:
+      type: object
+      required: [language, source_code, test_cases]
+      properties:
+        language:
+          $ref: '#/components/schemas/Language'
+        source_code:
+          type: string
+        limits:
+          $ref: '#/components/schemas/ExecutionLimits'
+        test_cases:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCase'
+
+    CompilationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        time_taken_ms:
+          type: integer
+        compiler_output:
+          type: string
+
+    TestCaseResult:
+      type: object
+      properties:
+        id:
+          type: integer
+        passed:
+          type: boolean
+        status:
+          type: string
+        actual_output:
+          type: string
+        execution_time_ms:
+          type: integer
+        memory_used_kb:
+          type: integer
+
+    EvaluationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        compilation:
+          $ref: '#/components/schemas/CompilationResult'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCaseResult'
+        score_percentage:
+          type: number
+        summary:
+          type: string
+
+    AIGenerateRequest:
+      type: object
+      required: [assignment_title, assignment_description, language]
+      properties:
+        assignment_title:
+          type: string
+        assignment_description:
+          type: string
+        language:
+          $ref: '#/components/schemas/Language'
+        number_of_tests:
+          type: integer
+          default: 5
+        reference_solution:
+          type: string
+
+    AIGenerateResponse:
+      type: object
+      properties:
+        test_cases:
+          type: array
+          items:
+            $ref: '#/components/schemas/TestCase'
