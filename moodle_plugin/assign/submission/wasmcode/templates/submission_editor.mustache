@@ -1,0 +1,44 @@
+<div class="wasmcode-submission-container card p-3 shadow-sm mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h5 class="mb-0">
+            <i class="fa fa-code text-primary me-2"></i>
+            {{#str}}source_code, assignsubmission_wasmcode{{/str}}
+        </h5>
+        <span class="badge bg-secondary text-uppercase">{{language}}</span>
+    </div>
+
+    <!-- Code Input Area -->
+    <div class="editor-wrapper mb-3">
+        <textarea 
+            name="{{element_name}}" 
+            id="{{element_id}}" 
+            class="form-control font-monospace wasm-code-area" 
+            rows="16" 
+            placeholder="// Write your {{language}} code here..."
+            spellcheck="false">{{current_code}}</textarea>
+    </div>
+
+    <!-- Controls -->
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="text-muted small">
+            <i class="fa fa-shield text-success me-1"></i>
+            <span>{{#str}}sandboxed_with_wasmtime, assignsubmission_wasmcode{{/str}}</span>
+        </div>
+        <div>
+            <button type="button" class="btn btn-outline-primary btn-sm me-2 btn-test-code" id="btn-test-run">
+                <i class="fa fa-play me-1"></i> {{#str}}run_public_tests, assignsubmission_wasmcode{{/str}}
+            </button>
+        </div>
+    </div>
+
+    <!-- Test Run Results Console -->
+    <div id="wasm-test-console" class="mt-3 d-none">
+        <div class="card bg-dark text-white p-2">
+            <div class="d-flex justify-content-between align-items-center border-bottom border-secondary pb-1 mb-2">
+                <span class="small font-monospace"><i class="fa fa-terminal me-1"></i> Output Console</span>
+                <span id="wasm-run-status" class="badge"></span>
+            </div>
+            <pre id="wasm-console-output" class="mb-0 text-light font-monospace small" style="max-height: 200px; overflow-y: auto;"></pre>
+        </div>
+    </div>
+</div>

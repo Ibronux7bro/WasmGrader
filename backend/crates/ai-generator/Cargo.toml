@@ -1,0 +1,12 @@
+[package]
+name = "moodle-wasm-ai-generator"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+moodle-wasm-common = { path = "../common" }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }

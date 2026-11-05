@@ -1,0 +1,16 @@
+[package]
+name = "moodle-wasm-engine"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+moodle-wasm-common = { path = "../common" }
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }
+rayon = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+wat = "1.0"

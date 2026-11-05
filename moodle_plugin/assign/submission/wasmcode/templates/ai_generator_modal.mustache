@@ -1,0 +1,50 @@
+<div class="wasmcode-ai-generator-panel mb-3 p-3 bg-light border rounded">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <label class="form-label fw-bold mb-0">
+            <i class="fa fa-magic text-warning me-1"></i>
+            {{#str}}ai_test_generator, assignsubmission_wasmcode{{/str}}
+        </label>
+        <button type="button" class="btn btn-sm btn-outline-success" id="btn-open-ai-modal">
+            <i class="fa fa-sparkles me-1"></i> {{#str}}generate_with_ai, assignsubmission_wasmcode{{/str}}
+        </button>
+    </div>
+    <div class="form-text text-muted small">
+        {{#str}}ai_test_generator_desc, assignsubmission_wasmcode{{/str}}
+    </div>
+</div>
+
+<!-- Modal Dialog -->
+<div class="modal fade" id="wasmAiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fa fa-robot text-primary me-2"></i>{{#str}}generate_tests_modal_title, assignsubmission_wasmcode{{/str}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">{{#str}}number_of_tests, assignsubmission_wasmcode{{/str}}</label>
+                    <input type="number" id="ai-test-count" class="form-control" value="5" min="1" max="15">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{#str}}reference_solution_optional, assignsubmission_wasmcode{{/str}}</label>
+                    <textarea id="ai-reference-sol" class="form-control font-monospace" rows="4" placeholder="// Optional teacher's correct solution to verify test cases"></textarea>
+                </div>
+                <div id="ai-preview-container" class="d-none">
+                    <h6>{{#str}}preview_generated_tests, assignsubmission_wasmcode{{/str}}</h6>
+                    <div id="ai-preview-list" class="list-group mb-3"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{#str}}cancel, moodle{{/str}}</button>
+                <button type="button" class="btn btn-primary" id="btn-ai-submit-generate">
+                    <span class="spinner-border spinner-border-sm d-none" id="ai-spinner" role="status"></span>
+                    {{#str}}generate_now, assignsubmission_wasmcode{{/str}}
+                </button>
+                <button type="button" class="btn btn-success d-none" id="btn-ai-apply-tests">
+                    {{#str}}apply_tests_to_assignment, assignsubmission_wasmcode{{/str}}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

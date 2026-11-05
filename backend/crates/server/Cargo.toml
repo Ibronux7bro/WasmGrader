@@ -1,0 +1,17 @@
+[package]
+name = "moodle-wasm-server"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+moodle-wasm-common = { path = "../common" }
+moodle-wasm-compiler = { path = "../compiler" }
+moodle-wasm-engine = { path = "../engine" }
+moodle-wasm-ai-generator = { path = "../ai-generator" }
+axum = { workspace = true }
+tokio = { workspace = true }
+tower = { workspace = true }
+tower-http = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde_json = { workspace = true }

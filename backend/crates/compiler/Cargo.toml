@@ -1,0 +1,12 @@
+[package]
+name = "moodle-wasm-compiler"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+moodle-wasm-common = { path = "../common" }
+tempfile = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
