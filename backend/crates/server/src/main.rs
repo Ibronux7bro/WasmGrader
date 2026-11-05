@@ -6,6 +6,7 @@ use std::sync::Arc;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 use moodle_wasm_ai_generator::AITestGeneratorClient;
+use moodle_wasm_compiler::CompilationCache;
 use moodle_wasm_engine::WasmSandboxEngine;
 use routes::create_router;
 
@@ -13,6 +14,7 @@ use routes::create_router;
 pub struct AppState {
     pub engine: Arc<WasmSandboxEngine>,
     pub ai_client: Arc<AITestGeneratorClient>,
+    pub cache: Arc<CompilationCache>,
 }
 
 #[tokio::main]
@@ -31,7 +33,9 @@ async fn main() -> anyhow::Result<()> {
     tracing::info!("Initializing AI Test Generator Client...");
     let ai_client = Arc::new(AITestGeneratorClient::new()?);
 
-    let state = AppState { engine, ai_client };
+    let cache = Arc::new(CompilationCache::default());
+
+    let state = AppState { engine, ai_client, cache };
     let app = create_router(state);
 
     let port: u16 = std::env::var("PORT")

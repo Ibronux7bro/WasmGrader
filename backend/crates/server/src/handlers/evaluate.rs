@@ -38,35 +38,56 @@ pub async fn handle_evaluate(
         }
     };
 
-    // 2. Compile student code to WASM
-    let compiled = match compiler.compile(&payload.source_code).await {
-        Ok(c) => c,
-        Err(e) => {
-            return (
-                StatusCode::OK,
-                Json(EvaluationResponse {
-                    success: false,
-                    compilation: CompilationResult {
-                        success: false,
-                        time_taken_ms: 0,
-                        compiler_output: e.to_string(),
+    // 2. Compile student code to WASM (with caching)
+    let cache_key = moodle_wasm_compiler::CompilationCache::compute_key(
+        &format!("{:?}", payload.language),
+        &payload.source_code,
+    );
+
+    let (wasm_bytes, compilation_result) = if let Some(cached_bytes) = state.cache.get(&cache_key) {
+        tracing::debug!("Compilation cache hit for code submission");
+        (
+            cached_bytes,
+            CompilationResult {
+                success: true,
+                time_taken_ms: 0,
+                compiler_output: "[Cached compilation]".to_string(),
+            },
+        )
+    } else {
+        match compiler.compile(&payload.source_code).await {
+            Ok(c) => {
+                state.cache.put(cache_key, c.wasm_bytes.clone());
+                (
+                    c.wasm_bytes,
+                    CompilationResult {
+                        success: true,
+                        time_taken_ms: c.compilation_time_ms,
+                        compiler_output: c.compiler_output,
                     },
-                    results: vec![],
-                    score_percentage: 0.0,
-                    summary: "Compilation Failed".to_string(),
-                }),
-            );
+                )
+            }
+            Err(e) => {
+                return (
+                    StatusCode::OK,
+                    Json(EvaluationResponse {
+                        success: false,
+                        compilation: CompilationResult {
+                            success: false,
+                            time_taken_ms: 0,
+                            compiler_output: e.to_string(),
+                        },
+                        results: vec![],
+                        score_percentage: 0.0,
+                        summary: "Compilation Failed".to_string(),
+                    }),
+                );
+            }
         }
     };
 
-    let compilation_result = CompilationResult {
-        success: true,
-        time_taken_ms: compiled.compilation_time_ms,
-        compiler_output: compiled.compiler_output,
-    };
-
     // 3. Compile WASM bytecode into Wasmtime Module
-    let module = match engine.compile_module(&compiled.wasm_bytes) {
+    let module = match engine.compile_module(&wasm_bytes) {
         Ok(m) => m,
         Err(e) => {
             return (

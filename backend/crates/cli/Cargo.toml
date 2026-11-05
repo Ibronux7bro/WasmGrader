@@ -1,0 +1,13 @@
+[package]
+name = "moodle-wasm-cli"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+moodle-wasm-common = { path = "../common" }
+moodle-wasm-compiler = { path = "../compiler" }
+moodle-wasm-engine = { path = "../engine" }
+clap = { workspace = true }
+tokio = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }

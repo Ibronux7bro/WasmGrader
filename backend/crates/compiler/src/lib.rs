@@ -1,7 +1,10 @@
+pub mod cache;
 pub mod clang;
 pub mod python;
 pub mod rust;
 pub mod traits;
+
+pub use cache::CompilationCache;
 
 pub use clang::ClangCompiler;
 pub use python::PythonCompiler;
