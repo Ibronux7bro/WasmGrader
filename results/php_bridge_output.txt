@@ -1,0 +1,10 @@
+﻿[*] Testing PHP Moodle Client integration with Evaluation Server...
+  [+] Status: Success!
+  [+] Summary: Passed 2 of 2 test cases
+  [+] Score: 100%
+  [+] Passed 2 test cases.
+
+[*] Testing PHP Moodle AI Test Generator Bridge...
+  [+] Generated 3 test cases via PHP Client.
+
+[SUCCESS] PHP Moodle Bridge is 100% operational!

@@ -1,0 +1,7 @@
+﻿No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\ajax.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\locallib.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\settings.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\version.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\classes\client.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\lang\ar\assignsubmission_wasmcode.php
+No syntax errors detected in C:\Users\77182\OneDrive\Desktop\back\moodle_plugin\assign\submission\wasmcode\lang\en\assignsubmission_wasmcode.php
