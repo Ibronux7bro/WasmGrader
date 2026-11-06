@@ -11,26 +11,35 @@ import urllib.error
 
 API_URL = "http://localhost:8080"
 
-def send_request(endpoint, data):
+def send_request(endpoint, data=None):
     url = f"{API_URL}{endpoint}"
-    payload = json.dumps(data).encode("utf-8")
-    req = urllib.request.Request(
-        url,
-        data=payload,
-        headers={"Content-Type": "application/json"}
-    )
+    if data is not None:
+        payload = json.dumps(data).encode("utf-8")
+        req = urllib.request.Request(
+            url,
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+    else:
+        req = urllib.request.Request(url, method="GET")
+
     try:
         with urllib.request.urlopen(req) as response:
             return response.status, json.loads(response.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
-        return e.code, json.loads(e.read().decode("utf-8"))
+        body = e.read().decode("utf-8")
+        try:
+            return e.code, json.loads(body)
+        except Exception:
+            return e.code, {"error": body}
     except urllib.error.URLError as e:
         print(f"Error connecting to {url}: {e.reason}")
         return None, None
 
 def test_health():
     print("[1] Checking service health...")
-    status, res = send_request("/health", {})
+    status, res = send_request("/health")
     if status == 200:
         print(f"    Health Status: OK -> {res}")
     else:
