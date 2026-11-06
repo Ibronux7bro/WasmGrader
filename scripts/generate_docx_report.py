@@ -341,6 +341,9 @@ def create_report():
         "WebAssembly memory is structured as a contiguous, bounds-checked linear array of 64KB pages. The system implements the `wasmtime::ResourceLimiter` trait to intercept every runtime `memory.grow` instruction. If an allocation would cause the instance to exceed the instructor's configured ceiling (e.g., 64 MB), the request is rejected immediately, causing the module to safely abort with `TestStatus::MemoryLimitExceeded`."
     )
 
+    fig_mem_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_wasm_memory_layout.png')
+    add_figure(fig_mem_path, "Figure 2: Wasmtime Process-Isolated Instance Boundary, Linear Memory Layout, Fuel Counter, and Virtual I/O Pipes.")
+
     add_h3("Pillar 3: Zero-Leak In-Memory Virtual I/O")
     add_para(
         "The WebAssembly System Interface (WASI) context is constructed in a strictly hermetic mode using `WasiCtxBuilder`. No host directory paths are pre-opened, socket capabilities are removed, and environment variables are stripped. `stdin`, `stdout`, and `stderr` are wired exclusively to memory pipes (`MemoryInputPipe` and `MemoryOutputPipe`) capped at 1 MB, preventing buffer flooding."
@@ -352,7 +355,7 @@ def create_report():
     )
 
     fig2_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig2_parallel_benchmark.png')
-    add_figure(fig2_path, "Figure 2: Execution Latency Comparison: Rayon Parallel Pool vs Sequential Evaluation.")
+    add_figure(fig2_path, "Figure 3: Execution Latency Comparison: Rayon Work-Stealing Parallel Pool vs Sequential Engine.")
 
     # ----------------------------------------------------
     # CHAPTER 4: MULTI-LANGUAGE COMPILATION PIPELINE
@@ -414,6 +417,9 @@ def create_report():
         "A critical vulnerability in automated test generation is 'AI Hallucination'—where the model computes incorrect expected outputs. To eliminate this risk, the evaluator offers a Dual Verification Workflow: if the instructor provides an optional Reference Solution, the backend compiles and executes the reference solution against the AI-generated inputs. The actual output produced by the instructor's code automatically overwrites the `expected_output` field, ensuring 100% ground-truth correctness."
     )
 
+    fig_ai_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_moodle_ai_modal.png')
+    add_figure(fig_ai_path, "Figure 4: Instructor AI Test Case Synthesis Interactive Modal Window (Moodle Plugin View with Public/Secret Tagging).")
+
     # ----------------------------------------------------
     # CHAPTER 6: MOODLE INTEGRATION (PHP BRIDGE PLUGIN)
     # ----------------------------------------------------
@@ -434,10 +440,24 @@ def create_report():
     p_life.add_run("• view_summary(): ").bold = True
     p_life.add_run("Displays the evaluation badge, score percentage, and diagnostic report to instructors and students.")
 
+    fig_inst_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_moodle_instructor_settings.png')
+    add_figure(fig_inst_path, "Figure 5: Moodle Assignment Configuration Page with WASM Sandbox Constraints and JSON Test Suite Editor.")
+
     add_h2("6.2 Student Interactive Console & AJAX Runner")
     add_para(
         "Through `editor.js` and `ajax.php`, students are empowered with a 'Run Public Tests' capability. Prior to submitting their final assignment, students can execute their solution against visible test cases. Hidden test cases remain confidential on the server, preserving academic integrity."
     )
+
+    fig_stud_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_moodle_student_editor.png')
+    add_figure(fig_stud_path, "Figure 6: Student Submission Interface Featuring Dark-Mode IDE and Real-Time Sandboxed Execution Terminal Console.")
+
+    add_h2("6.3 Automated Gradebook Synchronization & Ledger")
+    add_para(
+        "Upon final submission, the student's code is evaluated against the entire test suite (both public sample cases and hidden grading cases). The resulting weighted score is written directly to the Moodle Gradebook (`mdl_grade_grades`), accompanied by structured feedback diagnostics."
+    )
+
+    fig_gb_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_moodle_gradebook.png')
+    add_figure(fig_gb_path, "Figure 7: Moodle Automated Gradebook Ledger with Dynamic Scoring, Fuel Timeout Interceptions, and Plagiarism Flags.")
 
     # ----------------------------------------------------
     # CHAPTER 7: CODE SIMILARITY & PLAGIARISM ENGINE
@@ -457,7 +477,10 @@ def create_report():
     )
 
     fig3_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig3_similarity_scores.png')
-    add_figure(fig3_path, "Figure 3: Jaccard Similarity Resistance to Disguised and Obfuscated Code Submissions.")
+    add_figure(fig3_path, "Figure 8: Jaccard Similarity Resistance to Disguised and Obfuscated Code Submissions.")
+
+    fig_heat_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig_plagiarism_heatmap.png')
+    add_figure(fig_heat_path, "Figure 9: Cross-Submission Plagiarism Heatmap Comparing Alice, Bob, Charlie, David, and Emma.")
 
     # ----------------------------------------------------
     # CHAPTER 8: EXPERIMENTAL BENCHMARKS & VERIFICATION
@@ -503,7 +526,7 @@ def create_report():
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
     fig4_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig4_terminal_results.png')
-    add_figure(fig4_path, "Figure 4: Automated Verification Test Suite Execution Output (Terminal Console).")
+    add_figure(fig4_path, "Figure 10: Automated Verification Test Suite Execution Output (Terminal Console with Live Evaluations).")
 
     # ----------------------------------------------------
     # CHAPTER 9: DEPLOYMENT & PRODUCTION OPERATIONS

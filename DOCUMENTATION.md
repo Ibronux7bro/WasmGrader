@@ -136,13 +136,15 @@ match run_result {
 #### Pillar 2: Memory Bounds Enforcement (ResourceLimiter)
 WebAssembly memory is structured as a contiguous, bounds-checked linear array of 64KB pages. The system implements the `wasmtime::ResourceLimiter` trait to intercept every runtime `memory.grow` instruction. If an allocation would cause the instance to exceed the instructor's configured ceiling (e.g., 64 MB), the request is rejected immediately, causing the module to safely abort with `TestStatus::MemoryLimitExceeded`.
 
+![Figure 2: Wasmtime Process-Isolated Instance Boundary, Linear Memory Layout, Fuel Counter, and Virtual I/O Pipes](results/figures/fig_wasm_memory_layout.png)
+
 #### Pillar 3: Zero-Leak In-Memory Virtual I/O
 The WebAssembly System Interface (WASI) context is constructed in a strictly hermetic mode using `WasiCtxBuilder`. No host directory paths are pre-opened, socket capabilities are removed, and environment variables are stripped. `stdin`, `stdout`, and `stderr` are wired exclusively to memory pipes (`MemoryInputPipe` and `MemoryOutputPipe`) capped at 1 MB, preventing buffer flooding.
 
 ### 3.3 Concurrency Architecture: Rayon Parallel Pool
 To achieve maximum hardware utilization, the engine creates a single shared `Arc<wasmtime::Engine>` instance across the daemon. When an evaluation request containing multiple test cases arrives, the test suite is partitioned across all available CPU cores using Rayon's work-stealing threadpool (`rayon::par_iter`). A 20-case test suite that would require 2.0 seconds sequentially completes in approximately 100 milliseconds under full parallelism.
 
-![Figure 2: Execution Latency: Rayon Parallel Pool vs Sequential](results/figures/fig2_parallel_benchmark.png)
+![Figure 3: Execution Latency: Rayon Parallel Pool vs Sequential](results/figures/fig2_parallel_benchmark.png)
 
 ---
 
@@ -194,6 +196,8 @@ To prevent conversational drift or malformed responses, the AI generator enforce
 ### 5.2 Dual Verification Against Reference Solution
 A critical vulnerability in automated test generation is "AI Hallucination"—where the model computes incorrect expected outputs. To eliminate this risk, the evaluator offers a **Dual Verification Workflow**: if the instructor provides an optional Reference Solution, the backend compiles and executes the reference solution against the AI-generated inputs. The actual output produced by the instructor's code automatically overwrites the `expected_output` field, ensuring 100% ground-truth correctness.
 
+![Figure 4: Instructor AI Test Case Synthesis Interactive Modal Window](results/figures/fig_moodle_ai_modal.png)
+
 ---
 
 ## 6. Moodle Integration Bridge (PHP Subplugin)
@@ -218,6 +222,18 @@ moodle_plugin/assign/submission/wasmcode/
     └── ar/assignsubmission_wasmcode.php # Complete Arabic locale bundle
 ```
 
+![Figure 5: Moodle Assignment Settings with WASM Sandbox Configuration](results/figures/fig_moodle_instructor_settings.png)
+
+### 6.2 Student Interactive Console & AJAX Runner
+Through `editor.js` and `ajax.php`, students are empowered with a "Run Public Tests" capability. Prior to submitting their final assignment, students can execute their solution against visible test cases. Hidden test cases remain confidential on the server, preserving academic integrity.
+
+![Figure 6: Student Submission Interface Featuring Dark-Mode IDE and Real-Time Sandboxed Execution Terminal Console](results/figures/fig_moodle_student_editor.png)
+
+### 6.3 Automated Gradebook Synchronization & Ledger
+Upon final submission, the student's code is evaluated against the entire test suite (both public sample cases and hidden grading cases). The resulting weighted score is written directly to the Moodle Gradebook (`mdl_grade_grades`), accompanied by structured feedback diagnostics.
+
+![Figure 7: Moodle Automated Gradebook Ledger with Dynamic Scoring](results/figures/fig_moodle_gradebook.png)
+
 ---
 
 ## 7. Plagiarism & Code Similarity Engine
@@ -228,7 +244,9 @@ $$\text{Similarity}(A, B) = \frac{|\text{Shingles}(A) \cap \text{Shingles}(B)|}{
 
 The normalization algorithm eliminates variable renaming, comment alterations, and whitespace modifications. Unit tests verify that even if a student disguises another student's submission by replacing single-line comments with multi-line blocks and reformatting braces, the engine detects a similarity index exceeding 90%.
 
-![Figure 3: Plagiarism Engine Similarity Score Distribution](results/figures/fig3_similarity_scores.png)
+![Figure 8: Plagiarism Engine Similarity Score Distribution](results/figures/fig3_similarity_scores.png)
+
+![Figure 9: Cross-Submission Plagiarism Heatmap](results/figures/fig_plagiarism_heatmap.png)
 
 ---
 
@@ -245,7 +263,7 @@ Rigorous integration testing was performed to validate the functional correctnes
 | **TC-05** | PHP Moodle Client Integration | `classes/client.php` | cURL Bridge Synchronized | 8 ms |
 | **TC-06** | PHP Codebase Linting | `moodle_plugin/**/*.php` | Zero Syntax Errors Detected | 40 ms total |
 
-![Figure 4: Automated Verification Test Suite Execution Output](results/figures/fig4_terminal_results.png)
+![Figure 10: Automated Verification Test Suite Execution Output](results/figures/fig4_terminal_results.png)
 
 ---
 
