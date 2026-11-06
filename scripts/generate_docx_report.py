@@ -490,6 +490,11 @@ def create_report():
         "Rigorous integration testing was performed to validate the functional correctness, execution latency, and security bounds of the platform."
     )
 
+    add_h2("8.1 Automated Benchmark Matrix")
+    add_para(
+        "Rigorous integration testing was performed to validate the functional correctness, execution latency, and security bounds of the platform."
+    )
+
     # Benchmark Table
     bench_table = doc.add_table(rows=7, cols=5)
     bench_table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -525,8 +530,22 @@ def create_report():
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
 
-    fig4_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig4_terminal_results.png')
-    add_figure(fig4_path, "Figure 10: Automated Verification Test Suite Execution Output (Terminal Console with Live Evaluations).")
+    add_h2("8.2 Empirical Live Execution & User Terminal Verification")
+    add_para(
+        "To provide empirical verification of the running platform, the entire test suite was executed natively on the host workstation. The captured terminal screenshots below substantiate the live behavior, latency, and correctness across all subsystems:"
+    )
+
+    # Real Screenshot 1: Python test suite
+    real_py_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'real_test_python_eval.png')
+    add_figure(real_py_path, "Figure 10: Real Live Terminal Execution of Python Test Suite (Health Check 200 OK, C Program Compilation, and 100% Score across 3/3 Test Cases in 3ms).")
+
+    # Real Screenshot 2: PHP Moodle Client Bridge
+    real_php_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'real_test_php_moodle.png')
+    add_figure(real_php_path, "Figure 11: Real Live Verification of PHP Moodle Bridge Subplugin (cURL Evaluation 100% Success and AI Test Generation Integration).")
+
+    # Real Screenshot 3: PowerShell Interactive Demo
+    real_ps_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'real_test_powershell_demo.png')
+    add_figure(real_ps_path, "Figure 12: Real Live PowerShell Demo Execution (5/5 Cases Passed in 3ms with Score 100.0% and Gradebook Payload Ready).")
 
     # ----------------------------------------------------
     # CHAPTER 9: DEPLOYMENT & PRODUCTION OPERATIONS

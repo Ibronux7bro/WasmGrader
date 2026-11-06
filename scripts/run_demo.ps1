@@ -18,18 +18,22 @@ try {
 }
 
 # Run sample C solution
-$testCases = Get-Content -Raw -Path "examples/assignments/01_sum_of_two_numbers/test_cases.json" | ConvertFrom-Json
+$testCases = Get-Content -Raw -Path "examples/assignments/01_sum_of_two_numbers/test_cases.json"
 $sourceCode = Get-Content -Raw -Path "examples/assignments/01_sum_of_two_numbers/solution.c"
 
-$payload = @{
-    language = "c"
-    source_code = $sourceCode
-    limits = @{
-        timeout_ms = 2000
-        memory_limit_mb = 64
-    }
-    test_cases = $testCases
-} | ConvertTo-Json -Depth 5
+$escapedSource = $sourceCode.Replace("\", "\\").Replace('"', '\"').Replace("`r", "").Replace("`n", "\n")
+
+$payload = @"
+{
+    "language": "c",
+    "source_code": "$escapedSource",
+    "limits": {
+        "timeout_ms": 2000,
+        "memory_limit_mb": 64
+    },
+    "test_cases": $testCases
+}
+"@
 
 Write-Host "`n[+] Submitting C solution to Sandbox for evaluation..." -ForegroundColor Cyan
 $resp = Invoke-RestMethod -Uri "$API_URL/api/v1/evaluate" -Method Post -Body $payload -ContentType "application/json"

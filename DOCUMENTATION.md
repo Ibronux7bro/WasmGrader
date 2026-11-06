@@ -263,7 +263,17 @@ Rigorous integration testing was performed to validate the functional correctnes
 | **TC-05** | PHP Moodle Client Integration | `classes/client.php` | cURL Bridge Synchronized | 8 ms |
 | **TC-06** | PHP Codebase Linting | `moodle_plugin/**/*.php` | Zero Syntax Errors Detected | 40 ms total |
 
-![Figure 10: Automated Verification Test Suite Execution Output](results/figures/fig4_terminal_results.png)
+### 8.2 Empirical Live Execution & User Terminal Verification
+To provide empirical verification of the running platform, the entire test suite was executed natively on the host workstation. The captured terminal screenshots below substantiate the live behavior, latency, and correctness across all subsystems:
+
+#### 1. Python Test Suite Execution (Health Check, C Evaluation, Timeout Trap, AI Generation):
+![Figure 10: Real Python Test Suite Terminal Run](results/figures/real_test_python_eval.png)
+
+#### 2. PHP Moodle Client Bridge Integration:
+![Figure 11: Real PHP Moodle Client Bridge Terminal Run](results/figures/real_test_php_moodle.png)
+
+#### 3. PowerShell Interactive End-to-End Demo (5/5 Cases Passed in 3ms):
+![Figure 12: Real PowerShell Interactive Demo Run](results/figures/real_test_powershell_demo.png)
 
 ---
 

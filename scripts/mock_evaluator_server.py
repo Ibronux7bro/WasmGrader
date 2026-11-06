@@ -37,8 +37,21 @@ class EvaluatorHandler(http.server.BaseHTTPRequestHandler):
 
     def handle_evaluate(self, data):
         lang = data.get("language", "c")
-        test_cases = data.get("test_cases", [])
+        raw_test_cases = data.get("test_cases", [])
+        if isinstance(raw_test_cases, dict) and "value" in raw_test_cases:
+            raw_test_cases = raw_test_cases["value"]
+
         code = data.get("source_code", "")
+
+        test_cases = []
+        for tc in raw_test_cases:
+            if isinstance(tc, str):
+                try:
+                    tc = json.loads(tc)
+                except Exception:
+                    continue
+            if isinstance(tc, dict):
+                test_cases.append(tc)
 
         results = []
         passed_count = 0
