@@ -101,6 +101,8 @@ flowchart TB
     API -->|Synchronized Grades| Plugin
 ```
 
+![Figure 1: High-Level System Architecture](results/figures/fig1_system_architecture.png)
+
 ---
 
 ## 3. High-Performance Sandboxing Engine (Rust & Wasmtime)
@@ -139,6 +141,8 @@ The WebAssembly System Interface (WASI) context is constructed in a strictly her
 
 ### 3.3 Concurrency Architecture: Rayon Parallel Pool
 To achieve maximum hardware utilization, the engine creates a single shared `Arc<wasmtime::Engine>` instance across the daemon. When an evaluation request containing multiple test cases arrives, the test suite is partitioned across all available CPU cores using Rayon's work-stealing threadpool (`rayon::par_iter`). A 20-case test suite that would require 2.0 seconds sequentially completes in approximately 100 milliseconds under full parallelism.
+
+![Figure 2: Execution Latency: Rayon Parallel Pool vs Sequential](results/figures/fig2_parallel_benchmark.png)
 
 ---
 
@@ -224,6 +228,8 @@ $$\text{Similarity}(A, B) = \frac{|\text{Shingles}(A) \cap \text{Shingles}(B)|}{
 
 The normalization algorithm eliminates variable renaming, comment alterations, and whitespace modifications. Unit tests verify that even if a student disguises another student's submission by replacing single-line comments with multi-line blocks and reformatting braces, the engine detects a similarity index exceeding 90%.
 
+![Figure 3: Plagiarism Engine Similarity Score Distribution](results/figures/fig3_similarity_scores.png)
+
 ---
 
 ## 8. Experimental Verification & Benchmark Results
@@ -238,6 +244,8 @@ Rigorous integration testing was performed to validate the functional correctnes
 | **TC-04** | AI Test Case Synthesis | `POST /api/v1/tests/generate` | 4 Verified Structured Cases | 12 ms |
 | **TC-05** | PHP Moodle Client Integration | `classes/client.php` | cURL Bridge Synchronized | 8 ms |
 | **TC-06** | PHP Codebase Linting | `moodle_plugin/**/*.php` | Zero Syntax Errors Detected | 40 ms total |
+
+![Figure 4: Automated Verification Test Suite Execution Output](results/figures/fig4_terminal_results.png)
 
 ---
 

@@ -179,6 +179,23 @@ def create_report():
         r_body.font.italic = True
         doc.add_paragraph().paragraph_format.space_after = Pt(6)
 
+    def add_figure(img_path, caption):
+        if os.path.exists(img_path):
+            p_img = doc.add_paragraph()
+            p_img.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_img.paragraph_format.space_before = Pt(12)
+            p_img.paragraph_format.space_after = Pt(4)
+            run = p_img.add_run()
+            run.add_picture(img_path, width=Inches(6.0))
+            
+            p_cap = doc.add_paragraph()
+            p_cap.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p_cap.paragraph_format.space_after = Pt(14)
+            r_cap = p_cap.add_run(caption)
+            r_cap.font.size = Pt(9.5)
+            r_cap.font.italic = True
+            r_cap.font.color.rgb = RGBColor(0x71, 0x80, 0x96)
+
     # ----------------------------------------------------
     # ABSTRACT / EXECUTIVE SUMMARY
     # ----------------------------------------------------
@@ -267,7 +284,10 @@ def create_report():
             r = p.add_run(text)
             r.font.size = Pt(9.5)
 
-    doc.add_paragraph().paragraph_format.space_after = Pt(12)
+    doc.add_paragraph().paragraph_format.space_after = Pt(8)
+
+    fig1_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig1_system_architecture.png')
+    add_figure(fig1_path, "Figure 1: High-Level System Topology and Microservices Component Decoupling.")
 
     add_callout(
         "The compute-bound sandboxed execution is physically decoupled from Moodle's web worker processes. Even if thousands of concurrent submissions occur, Moodle remains responsive because evaluations are handled by the asynchronous Rust Axum daemon.",
@@ -330,6 +350,9 @@ def create_report():
     add_para(
         "To achieve maximum hardware utilization, the engine creates a single shared `Arc<wasmtime::Engine>` instance across the daemon. When an evaluation request containing multiple test cases arrives, the test suite is partitioned across all available CPU cores using Rayon's work-stealing threadpool (`rayon::par_iter`). A 20-case test suite that would require 2.0 seconds sequentially completes in approximately 100 milliseconds under full parallelism."
     )
+
+    fig2_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig2_parallel_benchmark.png')
+    add_figure(fig2_path, "Figure 2: Execution Latency Comparison: Rayon Parallel Pool vs Sequential Evaluation.")
 
     # ----------------------------------------------------
     # CHAPTER 4: MULTI-LANGUAGE COMPILATION PIPELINE
@@ -433,6 +456,9 @@ def create_report():
         "Unit tests verify that even if a student disguises another student's submission by replacing single-line comments with multi-line blocks and reformatting braces, the engine detects a similarity index exceeding 90%."
     )
 
+    fig3_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig3_similarity_scores.png')
+    add_figure(fig3_path, "Figure 3: Jaccard Similarity Resistance to Disguised and Obfuscated Code Submissions.")
+
     # ----------------------------------------------------
     # CHAPTER 8: EXPERIMENTAL BENCHMARKS & VERIFICATION
     # ----------------------------------------------------
@@ -475,6 +501,9 @@ def create_report():
             r.font.size = Pt(9)
 
     doc.add_paragraph().paragraph_format.space_after = Pt(12)
+
+    fig4_path = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures', 'fig4_terminal_results.png')
+    add_figure(fig4_path, "Figure 4: Automated Verification Test Suite Execution Output (Terminal Console).")
 
     # ----------------------------------------------------
     # CHAPTER 9: DEPLOYMENT & PRODUCTION OPERATIONS
