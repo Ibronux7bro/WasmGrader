@@ -54,6 +54,10 @@ The project includes university-grade software engineering analysis, architectur
   - `uml_activity_diagram.png`
   - `uml_deployment_diagram.png`
   - `uml_database_er_diagram.png`
+  - `real_eval_scenarios_1_to_3.png` (Live Health Check & Token Auth 401 Rejection)
+  - `real_eval_scenarios_4_and_5.png` (Live Infinite Loop Fuel Trap & AI Gen)
+  - `real_eval_test_suite_100.png` (Live Test Suite 100% Pass Rate)
+  - `real_eval_moodle_php_bridge.png` (Live Moodle PHP Bridge & Gradebook Sync)
 
 ---
 

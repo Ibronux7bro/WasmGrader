@@ -284,10 +284,24 @@ WasmGrader incorporates Winnowing token hashing and AST vector cosine similarity
 ![Similarity Scores Distribution](results/figures/fig3_similarity_scores.png)
 
 ### 9.3. Real Execution Verification Screenshots
-Real test execution outputs captured from the active test harness:
-![Real Python Evaluation Test](results/figures/real_test_python_eval.png)
-![Real PHP Moodle Bridge Test](results/figures/real_test_php_moodle.png)
-![Real PowerShell Demo Run](results/figures/real_test_powershell_demo.png)
+
+Live test execution outputs captured directly from the PowerShell test harness on the host machine:
+
+#### 1. Live Daemon Health Check & Bearer Token Security Enforcement (HTTP 401 Rejection)
+![Live Execution: Scenarios 1 to 3](results/figures/real_eval_scenarios_1_to_3.png)
+*Demonstrates Wasmtime 21.0 engine health, Bearer token rejection (HTTP 401 Unauthorized for missing/malformed credentials), and successful evaluation of student Python code with a score of 100/100 points in 1.7ms.*
+
+#### 2. DoS Infinite Loop Protection (`Trap::OutOfFuel`) & AI Test Case Synthesis
+![Live Execution: Scenarios 4 and 5](results/figures/real_eval_scenarios_4_and_5.png)
+*Demonstrates instant termination of infinite loops (`while True: pass`) via deterministic CPU fuel depletion in 1.4ms with zero host hang, followed by automated LLM synthesis of happy-path, boundary, and edge-case test cases.*
+
+#### 3. Automated Verification Suite (100% Pass Rate)
+![Automated Verification Suite](results/figures/real_eval_test_suite_100.png)
+*Demonstrates execution of `scripts/test_evaluation_suite.py` passing all 4 unit and integration tests (Bearer token authentication, Python WASI arithmetic, fuel metering loop interception, and Moodle payload schema validation).*
+
+#### 4. Moodle PHP Plugin Bridge Verification & Gradebook Synchronization
+![Moodle PHP Bridge Verification](results/figures/real_eval_moodle_php_bridge.png)
+*Demonstrates execution of `moodle_plugin/assign/submission/wasmcode/classes/client.php` via PHP 8.2 CLI, issuing authenticated cURL requests to the evaluator daemon, receiving 100/100 marks, and successfully synchronizing with the Moodle Gradebook.*
 
 ---
 

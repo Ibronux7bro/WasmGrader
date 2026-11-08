@@ -413,11 +413,24 @@ def create_report():
     # ----------------------------------------------------
     add_h1("Chapter 10: Empirical Live Verification & User Terminal Results")
     add_para(
-        "The running platform was validated through live terminal execution on the host machine. The captured terminal screenshots below substantiate the correctness, security traps, and latency across all subsystems:"
+        "The running platform was validated through live terminal execution on the host machine. The captured terminal screenshots below substantiate the correctness, security traps, token authentication, and latency across all subsystems:"
     )
-    add_figure(os.path.join(fig_dir, 'real_test_python_eval.png'), "Figure 16: Real Live Terminal Execution of Python Test Suite (Health Check 200 OK, C Program Compilation, and 100% Score in 3ms).")
-    add_figure(os.path.join(fig_dir, 'real_test_php_moodle.png'), "Figure 17: Real Live Verification of PHP Moodle Bridge Subplugin (cURL Evaluation 100% Success and AI Test Generation).")
-    add_figure(os.path.join(fig_dir, 'real_test_powershell_demo.png'), "Figure 18: Real Live PowerShell Demo Execution (5/5 Cases Passed in 3ms with Score 100.0% and Gradebook Sync).")
+    add_figure(
+        os.path.join(fig_dir, 'real_eval_scenarios_1_to_3.png'),
+        "Figure 16: Live Execution Verification - Scenarios 1 to 3 (Evaluator Health Check, Bearer Token Rejection 401 Unauthorized, and Student Python Code 100/100 Points in 1.7ms)."
+    )
+    add_figure(
+        os.path.join(fig_dir, 'real_eval_scenarios_4_and_5.png'),
+        "Figure 17: Live Execution Verification - Scenarios 4 & 5 (DoS Infinite Loop Interception via Trap::OutOfFuel Halting in 1.4ms with Zero Host Lag, and LLM Test Case Synthesis)."
+    )
+    add_figure(
+        os.path.join(fig_dir, 'real_eval_test_suite_100.png'),
+        "Figure 18: Live Automated Verification Suite Execution (test_evaluation_suite.py - 100% Pass Rate Across Authentication, Python Arithmetic, Fuel Traps, and Moodle Payload Schema)."
+    )
+    add_figure(
+        os.path.join(fig_dir, 'real_eval_moodle_php_bridge.png'),
+        "Figure 19: Live Moodle PHP Plugin Bridge Verification (client.php Executing Python Assessment via cURL with Bearer Token, 100/100 Grade, and Gradebook Synchronization Passed)."
+    )
 
     # ----------------------------------------------------
     # CHAPTER 11: CONCLUSION
