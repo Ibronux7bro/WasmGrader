@@ -24,10 +24,8 @@ pub struct WasmSandboxEngine {
 impl WasmSandboxEngine {
     pub fn new() -> Result<Self> {
         let mut config = Config::new();
-        // Enable fuel metering for execution timeout control
+        // Enable fuel metering for deterministic execution timeout control
         config.consume_fuel(true);
-        // Epoch interruption as a secondary safeguard
-        config.epoch_interruption(true);
         // Optimize for speed
         config.cranelift_opt_level(wasmtime::OptLevel::Speed);
 
