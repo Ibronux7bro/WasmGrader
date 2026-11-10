@@ -14,7 +14,8 @@ pub async fn handle_evaluate(
     State(state): State<AppState>,
     Json(payload): Json<EvaluationRequest>,
 ) -> impl IntoResponse {
-    let engine = &state.engine;
+    let engine = state.engine.clone();
+
     // 1. Get compiler for language
     let compiler = match get_compiler(payload.language) {
         Ok(c) => c,
@@ -43,7 +44,6 @@ pub async fn handle_evaluate(
     );
 
     let (wasm_bytes, compilation_result) = if let Some(cached_bytes) = state.cache.get(&cache_key) {
-        tracing::debug!("Compilation cache hit for code submission");
         (
             cached_bytes,
             CompilationResult {
@@ -84,39 +84,53 @@ pub async fn handle_evaluate(
         }
     };
 
-    // 3. Run: compile module + execute tests inside a blocking thread (avoids nested Tokio runtime panic)
-    let engine_clone = engine.clone();
+    // 3. Run everything inside spawn_blocking to avoid nested Tokio runtime panic.
+    //    wasmtime_wasi::preview1::add_to_linker_sync uses block_on internally which
+    //    panics when called from a Tokio worker thread.
     let test_cases = payload.test_cases.clone();
     let limits = payload.limits.clone();
-    let wasm_bytes_clone = wasm_bytes.clone();
 
-    let (results, module_ok) = tokio::task::spawn_blocking(move || {
-        // Compile WASM inside blocking thread
-        let module = match engine_clone.compile_module(&wasm_bytes_clone) {
+    let blocking_result = tokio::task::spawn_blocking(move || {
+        // 3a. Compile WASM bytes into a Wasmtime Module
+        let module = match engine.compile_module(&wasm_bytes) {
             Ok(m) => m,
-            Err(e) => return (vec![], Err(e.to_string())),
+            Err(e) => return Err(e.to_string()),
         };
-        let executor = ParallelTestExecutor::new(&engine_clone, &module, &limits);
-        let results = executor.execute_all(&test_cases);
-        (results, Ok(()))
+        // 3b. Execute all test cases (uses add_to_linker_sync safely here)
+        let executor = ParallelTestExecutor::new(&engine, &module, &limits);
+        Ok(executor.execute_all(&test_cases))
     })
-    .await
-    .unwrap_or_default();
+    .await;
 
-    if let Err(e) = module_ok {
-        return (
-            StatusCode::OK,
-            Json(EvaluationResponse {
-                success: false,
-                compilation: compilation_result,
-                results: vec![],
-                score_percentage: 0.0,
-                summary: format!("WASM validation failed: {}", e),
-            }),
-        );
-    }
+    let results = match blocking_result {
+        Ok(Ok(r)) => r,
+        Ok(Err(e)) => {
+            return (
+                StatusCode::OK,
+                Json(EvaluationResponse {
+                    success: false,
+                    compilation: compilation_result,
+                    results: vec![],
+                    score_percentage: 0.0,
+                    summary: format!("WASM validation failed: {}", e),
+                }),
+            );
+        }
+        Err(_join_err) => {
+            return (
+                StatusCode::OK,
+                Json(EvaluationResponse {
+                    success: false,
+                    compilation: compilation_result,
+                    results: vec![],
+                    score_percentage: 0.0,
+                    summary: "Execution thread panicked".to_string(),
+                }),
+            );
+        }
+    };
 
-    // 5. Calculate weighted score
+    // 4. Calculate weighted score
     let total_weight: f64 = payload.test_cases.iter().map(|tc| tc.weight).sum();
     let earned_weight: f64 = results
         .iter()
