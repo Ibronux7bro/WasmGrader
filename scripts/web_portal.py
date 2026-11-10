@@ -142,115 +142,123 @@ HTML_CONTENT = """<!DOCTYPE html>
             </li>
         </ul>
 
-        <!-- TAB 1: SANDBOX EVALUATOR -->
+        <!-- TAB 1: SANDBOX EVALUATOR (Dark-Mode IDE + Terminal) -->
         <div id="sandboxTab" class="tab-content-area">
-            <div class="row g-4">
-                <!-- Left Column: Code Editor & Presets -->
-                <div class="col-lg-7">
-                    <div class="card card-custom p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-bold mb-0"><i class="bi bi-code-slash text-primary me-2"></i>Student Code Submission</h5>
-                            <div class="d-flex gap-2">
-                                <select id="languageSelect" class="form-select form-select-sm" style="width: 120px;">
-                                    <option value="python" selected>Python</option>
-                                    <option value="c">C</option>
-                                    <option value="cpp">C++</option>
-                                    <option value="rust">Rust</option>
-                                </select>
-                                <select id="presetSelect" class="form-select form-select-sm" style="width: 220px;" onchange="loadPreset()">
-                                    <option value="two_sum">Preset: Two Sum (a + b)</option>
-                                    <option value="large_sum">Preset: Large Numbers</option>
-                                    <option value="neg_sum">Preset: Negative Integers</option>
-                                    <option value="infinite_loop">Preset: Infinite Loop (DoS Attack)</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <textarea id="sourceCode" class="form-control code-editor flex-grow-1" rows="12">a = int(input())
+          <!-- TOP BAR -->
+          <div style="background:#1e1e2e;border-radius:8px 8px 0 0;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333;">
+            <div style="display:flex;align-items:center;gap:14px;">
+              <span style="color:#cdd6f4;font-size:13px;font-weight:600;">&#128203; Assignment: Problem 01 &mdash; Sum of Two Numbers</span>
+              <span style="background:#313244;color:#a6e3a1;padding:3px 10px;border-radius:10px;font-size:11px;">Python 3 (WASI)</span>
+              <span style="background:#313244;color:#89b4fa;padding:3px 10px;border-radius:10px;font-size:11px;">&#9201; Deadline: 18 Nov 2026</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select id="languageSelect" style="background:#313244;color:#cdd6f4;border:1px solid #45475a;padding:4px 8px;border-radius:4px;font-size:12px;">
+                <option value="python" selected>Python 3</option>
+                <option value="c">C (clang/WASI)</option>
+                <option value="cpp">C++ (clang/WASI)</option>
+                <option value="rust">Rust (wasm32-wasi)</option>
+              </select>
+              <select id="presetSelect" style="background:#313244;color:#cdd6f4;border:1px solid #45475a;padding:4px 8px;border-radius:4px;font-size:12px;" onchange="loadPreset()">
+                <option value="two_sum">Two Sum (a + b)</option>
+                <option value="large_sum">Large Integers</option>
+                <option value="neg_sum">Negative Numbers</option>
+                <option value="infinite_loop">Infinite Loop (DoS)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- IDE BODY -->
+          <div style="display:flex;height:490px;border:1px solid #313244;border-top:none;overflow:hidden;">
+
+            <!-- FILE TREE -->
+            <div style="width:170px;background:#181825;padding:10px 0;flex-shrink:0;border-right:1px solid #313244;">
+              <div style="color:#6c7086;font-size:10px;padding:4px 14px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">EXPLORER</div>
+              <div style="color:#89b4fa;font-size:12px;padding:5px 14px;cursor:pointer;">&#128193; submission/</div>
+              <div style="color:#cdd6f4;font-size:12px;padding:5px 14px 5px 26px;background:#313244;border-left:2px solid #89b4fa;cursor:pointer;">&#128013; solution.py</div>
+              <div style="color:#6c7086;font-size:12px;padding:5px 14px 5px 26px;cursor:pointer;">&#128196; README.md</div>
+              <div style="color:#6c7086;font-size:11px;padding:14px 14px 4px;text-transform:uppercase;letter-spacing:1px;">SANDBOX</div>
+              <div style="color:#a6e3a1;font-size:11px;padding:4px 14px;cursor:pointer;">&#129514; test_cases (4)</div>
+              <div style="color:#f38ba8;font-size:11px;padding:4px 14px;cursor:pointer;">&#9956; fuel: 10M units</div>
+              <div style="color:#fab387;font-size:11px;padding:4px 14px;cursor:pointer;">&#128190; mem: 1024 KB</div>
+            </div>
+
+            <!-- CODE EDITOR -->
+            <div style="flex:1;background:#1e1e2e;display:flex;flex-direction:column;overflow:hidden;">
+              <div style="background:#181825;display:flex;border-bottom:1px solid #313244;">
+                <div style="background:#1e1e2e;color:#cdd6f4;padding:8px 18px;font-size:12px;border-top:2px solid #89b4fa;cursor:pointer;">&#128013; solution.py</div>
+                <div style="color:#6c7086;padding:8px 18px;font-size:12px;cursor:pointer;">&#128196; README.md</div>
+              </div>
+              <div style="display:flex;flex:1;overflow:hidden;">
+                <div style="background:#1e1e2e;color:#45475a;font-size:13px;font-family:monospace;padding:12px 10px;text-align:right;min-width:36px;line-height:1.65;user-select:none;border-right:1px solid #313244;">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12</div>
+                <textarea id="sourceCode" spellcheck="false"
+                  style="flex:1;background:#1e1e2e;color:#cdd6f4;border:none;outline:none;font-family:Consolas,'Courier New',monospace;font-size:13.5px;line-height:1.65;padding:12px 16px;resize:none;tab-size:4;"
+                  rows="12">a = int(input())
 b = int(input())
 print(a + b)</textarea>
-
-                        <!-- Execution Constraints -->
-                        <div class="row g-2 mt-3 p-3 bg-light rounded">
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold text-muted">CPU Timeout (ms)</label>
-                                <input type="number" id="timeoutMs" class="form-control form-control-sm" value="2000">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold text-muted">Memory Limit (MB)</label>
-                                <input type="number" id="memoryMb" class="form-control form-control-sm" value="64">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label small fw-semibold text-muted">Fuel Metering Budget</label>
-                                <input type="text" class="form-control form-control-sm bg-white" value="2,000,000,000 units" readonly>
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-end gap-2 mt-3">
-                            <button id="runBtn" class="btn btn-primary px-4 fw-semibold" onclick="runEvaluation()">
-                                <i class="bi bi-play-fill me-1"></i> Run in WASM Sandbox
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Test Cases & Live Results -->
-                <div class="col-lg-5">
-                    <div class="card card-custom p-4 h-100">
-                        <h5 class="fw-bold mb-3"><i class="bi bi-check2-square text-success me-2"></i>Assessment & Test Cases</h5>
-
-                        <!-- Test Cases list -->
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="small fw-semibold text-muted">Grading Test Cases</span>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="addTestCase()">
-                                    <i class="bi bi-plus-lg"></i> Add Case
-                                </button>
-                            </div>
-                            <div id="testCasesContainer" class="d-flex flex-column gap-2" style="max-height: 200px; overflow-y: auto;">
-                                <!-- Test Case 1 -->
-                                <div class="p-2 border rounded bg-light small" id="tc_card_1">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>Test Case #1</strong>
-                                        <span class="badge bg-primary">Weight: 50%</span>
-                                    </div>
-                                    <div class="row g-2 mt-1">
-                                        <div class="col-6">
-                                            <input type="text" class="form-control form-control-sm tc-input" value="5\n10\n" placeholder="Input">
-                                        </div>
-                                        <div class="col-6">
-                                            <input type="text" class="form-control form-control-sm tc-expected" value="15\n" placeholder="Expected">
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Test Case 2 -->
-                                <div class="p-2 border rounded bg-light small" id="tc_card_2">
-                                    <div class="d-flex justify-content-between">
-                                        <strong>Test Case #2</strong>
-                                        <span class="badge bg-primary">Weight: 50%</span>
-                                    </div>
-                                    <div class="row g-2 mt-1">
-                                        <div class="col-6">
-                                            <input type="text" class="form-control form-control-sm tc-input" value="100000\n200000\n" placeholder="Input">
-                                        </div>
-                                        <div class="col-6">
-                                            <input type="text" class="form-control form-control-sm tc-expected" value="300000\n" placeholder="Expected">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Results Panel -->
-                        <div id="resultsPanel" class="mt-auto">
-                            <h6 class="fw-bold mb-2">Live Assessment Result</h6>
-                            <div id="resultContent" class="p-3 border rounded text-center text-muted">
-                                Click "Run in WASM Sandbox" to execute student code.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+              </div>
+              <div style="background:#89b4fa;color:#1e1e2e;padding:3px 14px;font-size:11px;display:flex;justify-content:space-between;">
+                <span>&#128013; Python 3 &nbsp;&#8226;&nbsp; WASI Sandbox &nbsp;&#8226;&nbsp; UTF-8 &nbsp;&#8226;&nbsp; LF</span>
+                <span>Wasmtime 21.0 &nbsp;&#8226;&nbsp; WasmGrader v1.0</span>
+              </div>
             </div>
+
+            <!-- RIGHT: TEST CASES -->
+            <div style="width:260px;background:#181825;border-left:1px solid #313244;display:flex;flex-direction:column;flex-shrink:0;">
+              <div style="color:#89b4fa;font-size:11px;padding:10px 14px 6px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #313244;">Test Cases</div>
+              <div style="flex:1;overflow-y:auto;padding:8px;" id="testCasesContainer">
+                <div style="background:#313244;border-radius:5px;padding:8px 10px;margin-bottom:6px;font-size:11.5px;color:#cdd6f4;" class="tc_card">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:600;">TC #1</span><span style="color:#a6e3a1;font-size:10px;">PUBLIC 25%</span></div>
+                  <div style="font-family:monospace;">in: <input class="tc-input" value="5\n10\n" style="background:#1e1e2e;color:#a6e3a1;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:100px;"></div>
+                  <div style="font-family:monospace;margin-top:2px;">exp: <input class="tc-expected" value="15\n" style="background:#1e1e2e;color:#cba6f7;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:80px;"></div>
+                </div>
+                <div style="background:#313244;border-radius:5px;padding:8px 10px;margin-bottom:6px;font-size:11.5px;color:#cdd6f4;" class="tc_card">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:600;">TC #2</span><span style="color:#a6e3a1;font-size:10px;">PUBLIC 25%</span></div>
+                  <div style="font-family:monospace;">in: <input class="tc-input" value="-10\n25\n" style="background:#1e1e2e;color:#a6e3a1;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:100px;"></div>
+                  <div style="font-family:monospace;margin-top:2px;">exp: <input class="tc-expected" value="15\n" style="background:#1e1e2e;color:#cba6f7;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:80px;"></div>
+                </div>
+                <div style="background:#313244;border-radius:5px;padding:8px 10px;margin-bottom:6px;font-size:11.5px;color:#cdd6f4;" class="tc_card">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:600;">TC #3</span><span style="color:#f38ba8;font-size:10px;">SECRET 25%</span></div>
+                  <div style="font-family:monospace;">in: <input class="tc-input" value="0\n0\n" style="background:#1e1e2e;color:#a6e3a1;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:100px;"></div>
+                  <div style="font-family:monospace;margin-top:2px;">exp: <input class="tc-expected" value="0\n" style="background:#1e1e2e;color:#cba6f7;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:80px;"></div>
+                </div>
+                <div style="background:#313244;border-radius:5px;padding:8px 10px;margin-bottom:6px;font-size:11.5px;color:#cdd6f4;" class="tc_card">
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-weight:600;">TC #4</span><span style="color:#f38ba8;font-size:10px;">SECRET 25%</span></div>
+                  <div style="font-family:monospace;">in: <input class="tc-input" value="100000\n200000\n" style="background:#1e1e2e;color:#a6e3a1;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:100px;"></div>
+                  <div style="font-family:monospace;margin-top:2px;">exp: <input class="tc-expected" value="300000\n" style="background:#1e1e2e;color:#cba6f7;border:none;border-radius:3px;padding:1px 4px;font-size:11px;width:80px;"></div>
+                </div>
+                <button onclick="addTestCase()" style="width:100%;background:#313244;color:#89b4fa;border:1px dashed #45475a;padding:6px;border-radius:5px;font-size:11px;cursor:pointer;margin-top:2px;">+ Add Test Case</button>
+              </div>
+              <div style="padding:12px;border-top:1px solid #313244;">
+                <button id="runBtn" onclick="runEvaluation()" style="width:100%;background:#89b4fa;color:#1e1e2e;border:none;padding:10px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">
+                  &#9654; Run in WASM Sandbox
+                </button>
+                <div style="color:#6c7086;font-size:10px;text-align:center;margin-top:5px;">Wasmtime 21 &bull; WASI &bull; Fuel-Metered</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TERMINAL CONSOLE -->
+          <div style="background:#11111b;border-radius:0 0 8px 8px;border:1px solid #313244;border-top:2px solid #45475a;">
+            <div style="background:#181825;padding:6px 14px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #313244;">
+              <span style="color:#a6e3a1;font-size:12px;font-weight:600;">&#9654; TERMINAL &mdash; Sandbox Execution Console</span>
+              <span style="color:#6c7086;font-size:11px;">wasm-evaluator:8080</span>
+              <span id="termStatus" style="background:#313244;color:#a6e3a1;padding:2px 10px;border-radius:10px;font-size:10px;margin-left:auto;">&#9679; READY</span>
+            </div>
+            <div id="terminalOutput" style="font-family:Consolas,'Courier New',monospace;font-size:12px;color:#cdd6f4;padding:12px 16px;min-height:110px;max-height:150px;overflow-y:auto;line-height:1.75;">
+              <span style="color:#6c7086;">$ wasmgrader-cli --engine wasmtime-21 --fuel 10000000 --lang python solution.py</span><br>
+              <span style="color:#45475a;">Initializing WasmGrader sandbox engine v1.0...</span><br>
+              <span style="color:#45475a;">Engine: Wasmtime 21.0 (WASI Snapshot Preview 1) | Security: zero-trust | Mode: fuel-metered</span><br>
+              <span style="color:#45475a;">Connecting to evaluator at http://localhost:8080 ... OK</span><br>
+              <span style="color:#45475a;">Press &#9654; Run to compile &amp; execute student submission against test cases.</span>
+            </div>
+          </div>
+
+          <!-- hidden for compatibility -->
+          <input type="hidden" id="timeoutMs" value="2000">
+          <input type="hidden" id="memoryMb" value="64">
+          <div id="resultsPanel" style="display:none;"><div id="resultContent"></div></div>
+
         </div>
 
         <!-- TAB 2: AI TEST GENERATOR -->
@@ -478,11 +486,23 @@ Click "Trigger Moodle Plugin Submission" to test the real PHP client against Doc
             }
         }
 
+        function termLog(msg, color='#cdd6f4') {
+            const t = document.getElementById('terminalOutput');
+            if (!t) return;
+            const ts = new Date().toISOString().substr(11,12);
+            t.innerHTML += `<span style="color:#6c7086">[${ts}]</span> <span style="color:${color}">${msg}</span><br>`;
+            t.scrollTop = t.scrollHeight;
+        }
+
         async function runEvaluation() {
             const runBtn = document.getElementById('runBtn');
             const resultDiv = document.getElementById('resultContent');
+            const termStat = document.getElementById('termStatus');
             runBtn.disabled = true;
-            runBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Sandboxing...';
+            runBtn.innerHTML = '&#9203; Sandboxing...';
+            if (termStat) { termStat.style.color='#fab387'; termStat.textContent='● COMPILING'; }
+            termLog('$ POST /api/v1/evaluate  →  wasm-evaluator:8080', '#89b4fa');
+            termLog('Compiling student code to WebAssembly (WASI)...', '#fab387');
 
             // Gather inputs
             const inputs = document.querySelectorAll('.tc-input');
@@ -518,12 +538,23 @@ Click "Trigger Moodle Plugin Submission" to test the real PHP client against Doc
                     body: JSON.stringify(payload)
                 });
                 const data = await resp.json();
+                termLog(`Compilation: OK | Running ${data.test_cases ? data.test_cases.length : '?'} test cases in parallel...`, '#a6e3a1');
+                data.test_cases && data.test_cases.forEach((tc, i) => {
+                    const icon = tc.status === 'Passed' ? '✓' : '✗';
+                    const col  = tc.status === 'Passed' ? '#a6e3a1' : '#f38ba8';
+                    termLog(`  ${icon} TC#${tc.id} → ${tc.status} | time: ${tc.execution_time_ms}ms | mem: ${tc.memory_used_kb}KB | fuel: ${tc.fuel_consumed || '~'} units`, col);
+                });
+                const score = data.score || 0;
+                termLog(`Score: ${score}/100 pts | Status: ${data.status} | Total time: ${data.total_time_ms || 0}ms`, score >= 100 ? '#a6e3a1' : '#f38ba8');
+                if (termStat) { termStat.style.color = score>=100?'#a6e3a1':'#f38ba8'; termStat.textContent = score>=100?'● ACCEPTED':'● WRONG ANSWER'; }
                 renderResults(data);
             } catch (err) {
+                termLog(`ERROR: ${err.message}`, '#f38ba8');
+                if (termStat) { termStat.style.color='#f38ba8'; termStat.textContent='● ERROR'; }
                 resultDiv.innerHTML = `<div class="alert alert-danger">Evaluation failed: ${err.message}</div>`;
             } finally {
                 runBtn.disabled = false;
-                runBtn.innerHTML = '<i class="bi bi-play-fill me-1"></i> Run in WASM Sandbox';
+                runBtn.innerHTML = '&#9654; Run in WASM Sandbox';
             }
         }
 
@@ -587,7 +618,7 @@ Click "Trigger Moodle Plugin Submission" to test the real PHP client against Doc
 
         async function generateAiTests() {
             const box = document.getElementById('aiResults');
-            box.innerHTML = '<div class="text-center py-4"><span class="spinner-border text-warning"></span><br><small class="text-muted mt-2">AI Synthesizing Edge Cases...</small></div>';
+            box.innerHTML = '<div class="text-center py-4"><span class="spinner-border text-warning"></span><br><small class="text-muted mt-2">AI Synthesizing Edge Cases via Gemini 1.5...</small></div>';
             
             try {
                 const res = await fetch('/api/generate_tests', {
@@ -602,23 +633,89 @@ Click "Trigger Moodle Plugin Submission" to test the real PHP client against Doc
                 });
                 const data = await res.json();
                 window._generatedTests = data.test_cases;
-                let html = '<div class="d-flex flex-column gap-2">';
-                data.test_cases.forEach((tc, idx) => {
-                    html += `
-                        <div class="p-2 border rounded bg-white small">
-                            <div class="d-flex justify-content-between">
-                                <strong>${tc.name}</strong>
-                                <span class="badge bg-secondary">${tc.test_type || 'Standard'}</span>
-                            </div>
-                            <div class="mt-1 font-monospace text-muted">Input: <code>${JSON.stringify(tc.input)}</code> | Expected: <code>${JSON.stringify(tc.expected_output)}</code></div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-                box.innerHTML = html;
-                document.getElementById('importBtn').classList.remove('d-none');
+                // Show the AI Synthesis Modal
+                showAiSynthesisModal(data.test_cases, document.getElementById('aiTitle').value,
+                    document.getElementById('aiLang').options[document.getElementById('aiLang').selectedIndex].text);
             } catch(e) {
                 box.innerHTML = `<div class="alert alert-danger">AI generation failed: ${e.message}</div>`;
+            }
+        }
+
+        function showAiSynthesisModal(testCases, title, lang) {
+            // Tag assignment: first 2 = PUBLIC (Preview), last 2 = SECRET (Grading)
+            const visibility = ['PUBLIC','PUBLIC','SECRET','SECRET'];
+            const typeLabels = ['Standard Positive Addition','Boundary Negative Integer','Zero Value Neutrality','Extreme Large Scale Sum'];
+            const typeKeys   = ['standard','boundary','edge_case','large_input'];
+            const weights    = [20, 20, 30, 30];
+
+            let rows = '';
+            testCases.forEach((tc, i) => {
+                const isPublic = (visibility[i] === 'PUBLIC');
+                const badge = isPublic
+                    ? `<span class="badge" style="background:#2a7de1;font-size:12px;padding:6px 14px;">&#9634; PUBLIC (Preview)</span>`
+                    : `<span class="badge" style="background:#555;font-size:12px;padding:6px 14px;">&#9634; SECRET (Grading)</span>`;
+                const caseTitle = typeLabels[i] || tc.name;
+                const typeKey   = typeKeys[i]  || (tc.test_type || 'standard');
+                const w = weights[i] || Math.round(100/testCases.length);
+                rows += `
+                  <div style="border:1px solid #ddd;border-radius:6px;padding:14px 18px;margin-bottom:12px;background:#fff;display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                      <div style="font-weight:600;font-size:14px;margin-bottom:6px;">Case ${i+1}: ${caseTitle}</div>
+                      <div style="font-size:12.5px;color:#555;font-family:monospace;">
+                        Input: <strong>${tc.input.replace(/\\n/g,'\\\\n')}</strong>
+                        &nbsp;|&nbsp; Expected: <strong>${tc.expected_output.replace(/\\n/g,'\\\\n')}</strong>
+                        &nbsp;|&nbsp; Weight: <strong>${w}.0%</strong>
+                        &nbsp;|&nbsp; Type: <strong>${typeKey}</strong>
+                      </div>
+                    </div>
+                    <div style="margin-left:20px;flex-shrink:0;">${badge}</div>
+                  </div>`;
+            });
+
+            const modal = document.createElement('div');
+            modal.id = 'aiSynthesisModal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+            modal.innerHTML = `
+              <div style="background:#f4f4f4;border-radius:8px;width:820px;max-width:95%;box-shadow:0 20px 60px rgba(0,0,0,0.4);overflow:hidden;">
+                <!-- Header -->
+                <div style="background:#2a7de1;color:#fff;padding:16px 22px;display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:18px;">&#9634;</span>
+                  <span style="font-size:16px;font-weight:700;">AI Test Case Synthesis Assistant (Powered by Gemini 1.5)</span>
+                </div>
+                <!-- Subheader -->
+                <div style="padding:16px 22px 10px;background:#fff;border-bottom:1px solid #e0e0e0;">
+                  <div style="font-weight:700;font-size:14px;">Assignment Title: ${title}</div>
+                  <div style="font-size:12px;color:#666;margin-top:4px;">Target Language: ${lang} | Number of Cases: ${testCases.length}</div>
+                </div>
+                <!-- Test Cases -->
+                <div style="padding:18px 22px;background:#f4f4f4;max-height:400px;overflow-y:auto;">
+                  ${rows}
+                </div>
+                <!-- Footer -->
+                <div style="padding:14px 22px;background:#fff;border-top:1px solid #e0e0e0;display:flex;justify-content:flex-end;gap:12px;">
+                  <button onclick="document.getElementById('aiSynthesisModal').remove()" 
+                    style="background:#6c757d;color:#fff;border:none;padding:9px 24px;border-radius:5px;font-size:14px;font-weight:600;cursor:pointer;">
+                    Cancel
+                  </button>
+                  <button onclick="applyAiTestsFromModal()" 
+                    style="background:#28a745;color:#fff;border:none;padding:9px 24px;border-radius:5px;font-size:14px;font-weight:600;cursor:pointer;">
+                    Apply to Assignment
+                  </button>
+                </div>
+              </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function applyAiTestsFromModal() {
+            document.getElementById('aiSynthesisModal').remove();
+            if (window._generatedTests) {
+                const tests = window._generatedTests.map(t => ({
+                    input: t.input.replace(/\\n/g, '\\\\n'),
+                    expected: t.expected_output.replace(/\\n/g, '\\\\n'),
+                    weight: Math.round(100 / window._generatedTests.length)
+                }));
+                renderTestCases(tests);
+                switchTab('sandboxTab');
             }
         }
 

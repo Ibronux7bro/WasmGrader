@@ -2,89 +2,76 @@
 set -e
 
 MOODLE_DIR=/var/www/html
-DATA_DIR=/var/moodledata
-CONFIG_FILE=$MOODLE_DIR/config.php
+MOODLE_DATA=/var/moodledata
 
-# Wait for MariaDB
-echo "[*] Waiting for MariaDB to be ready..."
+echo "======================================"
+echo "  WasmGrader Moodle Setup Starting..."
+echo "======================================"
+
+# Step 1: Download Moodle if not present
+if [ ! -f "$MOODLE_DIR/version.php" ]; then
+    echo "[1/5] Downloading Moodle 4.3..."
+    curl -fsSL https://download.moodle.org/download.php/direct/stable403/moodle-latest-403.tgz -o /tmp/moodle.tgz
+    echo "[2/5] Extracting Moodle..."
+    tar -xzf /tmp/moodle.tgz -C $MOODLE_DIR --strip-components=1
+    rm /tmp/moodle.tgz
+    chown -R www-data:www-data $MOODLE_DIR
+    echo "[2/5] Done."
+else
+    echo "[1/5] Moodle files already present."
+fi
+
+# Step 2: Create data dir
+mkdir -p $MOODLE_DATA
+chown -R www-data:www-data $MOODLE_DATA
+chmod 777 $MOODLE_DATA
+
+# Step 3: Wait for DB
+echo "[3/5] Waiting for MariaDB..."
 for i in $(seq 1 30); do
-    if php -r "
-        \$conn = @mysqli_connect(
-            getenv('MOODLE_DB_HOST') ?: 'mariadb',
-            getenv('MOODLE_DB_USER') ?: 'bn_moodle',
-            getenv('MOODLE_DB_PASS') ?: 'bitnami',
-            getenv('MOODLE_DB_NAME') ?: 'bitnami_moodle',
-            getenv('MOODLE_DB_PORT') ?: 3306
-        );
-        exit(\$conn ? 0 : 1);
-    " 2>/dev/null; then
-        echo "[+] MariaDB is ready!"
+    if php -r "new mysqli('mariadb','bn_moodle','bitnami','bitnami_moodle');" 2>/dev/null; then
+        echo "      MariaDB is ready!"
         break
     fi
-    echo "    Attempt $i/30 - waiting..."
+    echo "      Attempt $i/30 — waiting 3s..."
     sleep 3
 done
 
-# Generate config.php if not present
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "[*] Generating Moodle config.php..."
-    cat > $CONFIG_FILE <<EOF
-<?php
-unset(\$CFG);
-global \$CFG;
-\$CFG = new stdClass();
-
-\$CFG->dbtype    = 'mysqli';
-\$CFG->dblibrary = 'native';
-\$CFG->dbhost    = '${MOODLE_DB_HOST:-mariadb}';
-\$CFG->dbname    = '${MOODLE_DB_NAME:-bitnami_moodle}';
-\$CFG->dbuser    = '${MOODLE_DB_USER:-bn_moodle}';
-\$CFG->dbpass    = '${MOODLE_DB_PASS:-bitnami}';
-\$CFG->prefix    = 'mdl_';
-\$CFG->dboptions = array(
-    'dbpersist' => 0,
-    'dbport'    => ${MOODLE_DB_PORT:-3306},
-    'dbsocket'  => '',
-);
-
-\$CFG->wwwroot   = 'http://localhost';
-\$CFG->dataroot  = '$DATA_DIR';
-\$CFG->admin     = 'admin';
-\$CFG->directorypermissions = 0777;
-
-\$CFG->wasmgrader_api_url = '${WASM_API_URL:-http://wasm-evaluator:8080}';
-\$CFG->wasmgrader_api_key = '${WASM_API_KEY:-moodle_wasm_secret_key_2026}';
-
-require_once(__DIR__ . '/lib/setup.php');
-EOF
-    chown www-data:www-data $CONFIG_FILE
-fi
-
-# Install Moodle if not installed
-if php $MOODLE_DIR/admin/cli/isinstalled.php 2>/dev/null | grep -q "false"; then
-    echo "[*] Running Moodle installation..."
-    php $MOODLE_DIR/admin/cli/install_database.php \
+# Step 4: Install Moodle if config.php missing
+if [ ! -f "$MOODLE_DIR/config.php" ]; then
+    echo "[4/5] Running Moodle CLI installer..."
+    php $MOODLE_DIR/admin/cli/install.php \
+        --wwwroot=http://localhost \
+        --dataroot=$MOODLE_DATA \
+        --dbtype=mariadb \
+        --dbhost=mariadb \
+        --dbname=bitnami_moodle \
+        --dbuser=bn_moodle \
+        --dbpass=bitnami \
+        --adminuser=admin \
+        --adminpass=AdminPassword123! \
+        --adminemail=admin@wasmgrader.local \
+        --fullname="WasmGrader University" \
+        --shortname=WGU \
         --agree-license \
-        --adminuser="${MOODLE_ADMIN_USER:-admin}" \
-        --adminpass="${MOODLE_ADMIN_PASS:-AdminPassword123!}" \
-        --adminemail="${MOODLE_ADMIN_EMAIL:-admin@wasmgrader.local}" \
-        --fullname="WasmGrader LMS" \
-        --shortname="WasmGrader" \
-        --lang=en \
-        --non-interactive \
-        2>&1 || echo "[!] Install may have already run."
-    echo "[+] Moodle installed!"
+        --non-interactive
+    echo "[4/5] Moodle installed successfully!"
+else
+    echo "[4/5] Moodle already configured."
 fi
 
-# Copy WasmGrader plugin if present
-PLUGIN_SRC="/wasmcode_plugin"
-PLUGIN_DST="$MOODLE_DIR/mod/assign/submission/wasmcode"
-if [ -d "$PLUGIN_SRC" ] && [ ! -d "$PLUGIN_DST" ]; then
-    echo "[*] Installing WasmGrader Moodle plugin..."
-    cp -r $PLUGIN_SRC $PLUGIN_DST
-    chown -R www-data:www-data $PLUGIN_DST
-    echo "[+] Plugin installed at $PLUGIN_DST"
-fi
+# Step 5: Start Apache
+echo "[5/5] Starting Apache..."
+export APACHE_DOCUMENT_ROOT=/var/www/html
+export APACHE_RUN_USER=www-data
+export APACHE_RUN_GROUP=www-data
+export APACHE_LOG_DIR=/var/log/apache2
+export APACHE_PID_FILE=/var/run/apache2/apache2.pid
+export APACHE_RUN_DIR=/var/run/apache2
+export APACHE_LOCK_DIR=/var/lock/apache2
 
-echo "[+] Starting Apache..."
-exec "$@"
+# Fix any remaining variable references in Apache config
+find /etc/apache2 -name "*.conf" -exec grep -l 'APACHE_DOCUMENT_ROOT' {} \; | \
+  xargs -I{} sed -i 's|\${APACHE_DOCUMENT_ROOT}|/var/www/html|g' {}
+
+exec apache2-foreground

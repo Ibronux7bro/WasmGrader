@@ -19,3 +19,16 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Demo/figure HTML files (not part of project)
+scripts/moodle_figure10.html
+scripts/moodle_gradebook.html
+
+# Patch scripts (temp tools)
+scripts/patch_portal.py
+
+# Screenshots and images (not source code)
+results/figures/*.png
+*.png
+*.jpg
+*.jpeg
