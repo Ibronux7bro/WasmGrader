@@ -20,23 +20,27 @@ services:
 
   # 2. Moodle Learning Management System (LMS)
   moodle:
-    image: bitnamilegacy/moodle:4.4
+    build:
+      context: ./moodle_docker
+      dockerfile: Dockerfile
+    image: wasmgrader-moodle:latest
     container_name: moodle-server
     ports:
-      - "80:8080"
-      - "443:8443"
+      - "80:80"
     environment:
-      - MOODLE_USERNAME=admin
-      - MOODLE_PASSWORD=AdminPassword123!
-      - MOODLE_EMAIL=admin@example.com
-      - MARIADB_HOST=mariadb
-      - MARIADB_PORT_NUMBER=3306
-      - MOODLE_DATABASE_USER=bn_moodle
-      - MOODLE_DATABASE_PASSWORD=bitnami
-      - MOODLE_DATABASE_NAME=bitnami_moodle
+      - MOODLE_DB_HOST=mariadb
+      - MOODLE_DB_PORT=3306
+      - MOODLE_DB_USER=bn_moodle
+      - MOODLE_DB_PASS=bitnami
+      - MOODLE_DB_NAME=bitnami_moodle
+      - MOODLE_ADMIN_USER=admin
+      - MOODLE_ADMIN_PASS=AdminPassword123!
+      - MOODLE_ADMIN_EMAIL=admin@wasmgrader.local
+      - WASM_API_URL=http://wasm-evaluator:8080
+      - WASM_API_KEY=moodle_wasm_secret_key_2026
     volumes:
-      - moodle_data:/bitnami/moodle
-      - ./moodle_plugin/assign/submission/wasmcode:/opt/bitnami/moodle/mod/assign/submission/wasmcode
+      - moodle_data:/var/moodledata
+      - ./moodle_plugin/assign/submission/wasmcode:/wasmcode_plugin
     depends_on:
       - mariadb
       - wasm-evaluator
@@ -63,6 +67,8 @@ volumes:
   mariadb_data:
     driver: local
   moodle_data:
+    driver: local
+  moodledata_data:
     driver: local
 
 networks:
