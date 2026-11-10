@@ -20,27 +20,19 @@ services:
 
   # 2. Moodle Learning Management System (LMS)
   moodle:
-    build:
-      context: ./moodle_docker
-      dockerfile: Dockerfile
-    image: wasmgrader-moodle:latest
+    image: moodlehq/moodle-php-apache:8.2
     container_name: moodle-server
     ports:
       - "80:80"
     environment:
-      - MOODLE_DB_HOST=mariadb
-      - MOODLE_DB_PORT=3306
-      - MOODLE_DB_USER=bn_moodle
-      - MOODLE_DB_PASS=bitnami
-      - MOODLE_DB_NAME=bitnami_moodle
-      - MOODLE_ADMIN_USER=admin
-      - MOODLE_ADMIN_PASS=AdminPassword123!
-      - MOODLE_ADMIN_EMAIL=admin@wasmgrader.local
-      - WASM_API_URL=http://wasm-evaluator:8080
-      - WASM_API_KEY=moodle_wasm_secret_key_2026
+      - MOODLE_DOCKER_DBTYPE=mariadb
+      - MOODLE_DOCKER_DBHOST=mariadb
+      - MOODLE_DOCKER_DBNAME=bitnami_moodle
+      - MOODLE_DOCKER_DBUSER=bn_moodle
+      - MOODLE_DOCKER_DBPASS=bitnami
+      - APACHE_DOCUMENT_ROOT=/var/www/html
     volumes:
-      - moodle_data:/var/moodledata
-      - ./moodle_plugin/assign/submission/wasmcode:/wasmcode_plugin
+      - moodle_data:/var/www/moodledata
     depends_on:
       - mariadb
       - wasm-evaluator

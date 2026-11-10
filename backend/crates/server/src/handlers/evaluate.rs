@@ -84,26 +84,37 @@ pub async fn handle_evaluate(
         }
     };
 
-    // 3. Compile WASM bytecode into Wasmtime Module
-    let module = match engine.compile_module(&wasm_bytes) {
-        Ok(m) => m,
-        Err(e) => {
-            return (
-                StatusCode::OK,
-                Json(EvaluationResponse {
-                    success: false,
-                    compilation: compilation_result,
-                    results: vec![],
-                    score_percentage: 0.0,
-                    summary: format!("WASM validation failed: {}", e),
-                }),
-            );
-        }
-    };
+    // 3. Run: compile module + execute tests inside a blocking thread (avoids nested Tokio runtime panic)
+    let engine_clone = engine.clone();
+    let test_cases = payload.test_cases.clone();
+    let limits = payload.limits.clone();
+    let wasm_bytes_clone = wasm_bytes.clone();
 
-    // 4. Run test cases concurrently in parallel worker pool
-    let executor = ParallelTestExecutor::new(&engine, &module, &payload.limits);
-    let results = executor.execute_all(&payload.test_cases);
+    let (results, module_ok) = tokio::task::spawn_blocking(move || {
+        // Compile WASM inside blocking thread
+        let module = match engine_clone.compile_module(&wasm_bytes_clone) {
+            Ok(m) => m,
+            Err(e) => return (vec![], Err(e.to_string())),
+        };
+        let executor = ParallelTestExecutor::new(&engine_clone, &module, &limits);
+        let results = executor.execute_all(&test_cases);
+        (results, Ok(()))
+    })
+    .await
+    .unwrap_or_default();
+
+    if let Err(e) = module_ok {
+        return (
+            StatusCode::OK,
+            Json(EvaluationResponse {
+                success: false,
+                compilation: compilation_result,
+                results: vec![],
+                score_percentage: 0.0,
+                summary: format!("WASM validation failed: {}", e),
+            }),
+        );
+    }
 
     // 5. Calculate weighted score
     let total_weight: f64 = payload.test_cases.iter().map(|tc| tc.weight).sum();
