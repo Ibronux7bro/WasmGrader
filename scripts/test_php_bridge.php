@@ -6,7 +6,7 @@
 define('MOODLE_INTERNAL', true);
 
 function get_config($plugin, $key) {
-    if ($key === 'server_url') return 'http://127.0.0.1:8085';
+    if ($key === 'server_url') return 'http://127.0.0.1:8080';
     if ($key === 'api_key') return 'moodle_wasm_secret_key_2026';
     return null;
 }
@@ -25,16 +25,36 @@ $client = new client();
 
 echo "[*] Submitting Python Assignment via Moodle PHP cURL Bridge...\n";
 $tests = [
-    ['id' => 'tc_php_1', 'input' => "10\n20\n", 'expected_output' => "30\n", 'points' => 50],
-    ['id' => 'tc_php_2', 'input' => "100\n50\n", 'expected_output' => "150\n", 'points' => 50]
+    [
+        'id' => 1,
+        'name' => 'test_1',
+        'input' => "10\n20\n",
+        'expected_output' => "30\n",
+        'weight' => 50.0,
+        'is_hidden' => false,
+        'test_type' => 'standard'
+    ],
+    [
+        'id' => 2,
+        'name' => 'test_2',
+        'input' => "100\n50\n",
+        'expected_output' => "150\n",
+        'weight' => 50.0,
+        'is_hidden' => false,
+        'test_type' => 'standard'
+    ]
 ];
 
 try {
     $result = $client->evaluate('python', "a = int(input())\nb = int(input())\nprint(a + b)", $tests);
     echo "[+] SUCCESS: Response received from WasmGrader daemon!\n";
-    echo "    Status: " . $result['status'] . "\n";
-    echo "    Grade:  " . $result['total_score'] . " / " . $result['max_score'] . " points\n";
-    echo "    Execution Time: " . $result['execution_time_us'] . " microseconds\n";
+    echo "    Success: " . ($result['success'] ? 'true' : 'false') . "\n";
+    echo "    Summary: " . $result['summary'] . "\n";
+    echo "    Grade:   " . $result['score_percentage'] . " / 100 points\n";
+    echo "    Compiler: " . $result['compilation']['compiler_output'] . "\n";
+    foreach ($result['results'] as $r) {
+        echo "      - Test #" . $r['id'] . ": " . (is_string($r['status']) ? $r['status'] : json_encode($r['status'])) . " (Execution Time: " . $r['execution_time_ms'] . " ms, Memory: " . $r['memory_used_kb'] . " KB)\n";
+    }
     echo "=======================================================\n";
     echo "   MOODLE GRADEBOOK SYNCHRONIZATION TEST: PASSED\n";
     echo "=======================================================\n\n";
