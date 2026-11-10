@@ -23,7 +23,7 @@ impl SandboxLimits {
 impl ResourceLimiter for SandboxLimits {
     fn memory_growing(
         &mut self,
-        current: usize,
+        _current: usize,
         desired: usize,
         _maximum: Option<usize>,
     ) -> Result<bool, wasmtime::Error> {
@@ -40,11 +40,11 @@ impl ResourceLimiter for SandboxLimits {
 
     fn table_growing(
         &mut self,
-        _current: usize,
-        desired: usize,
-        _maximum: Option<usize>,
+        _current: u32,
+        desired: u32,
+        _maximum: Option<u32>,
     ) -> Result<bool, wasmtime::Error> {
-        Ok(desired <= self.max_table_elements as usize)
+        Ok(desired <= self.max_table_elements)
     }
 }
 

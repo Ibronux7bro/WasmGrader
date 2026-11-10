@@ -2,7 +2,8 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
-use std::sync::Arc;
+
+use moodle_wasm_common::AIGenerateRequest;
 
 use crate::AppState;
 

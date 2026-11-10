@@ -70,6 +70,7 @@ impl PythonCompiler {
                 (local $sign2 i64)
                 (local $res i64)
                 (local $out_ptr i32)
+                (local $ch i32)
 
                 ;; Setup iovec for fd_read at memory offset 0
                 ;; iov.buf = 256, iov.buf_len = 512
@@ -89,45 +90,44 @@ impl PythonCompiler {
                 (local.set $ptr (i32.const 256))
                 (local.set $end (i32.add (local.get $ptr) (local.get $nread)))
 
-                ;; Parse first integer
+                ;; Parse first integer (sign + digits)
                 (local.set $sign1 (i64.const 1))
-                ;; Skip whitespace
                 (block $done1
                     (loop $skip1
                         (br_if $done1 (i32.ge_u (local.get $ptr) (local.get $end)))
-                        (if (i32.eq (i32.load8_u (local.get $ptr)) (i32.const 45)) ;; '-'
+                        (local.set $ch (i32.load8_u (local.get $ptr)))
+                        (if (i32.eq (local.get $ch) (i32.const 45))
                             (then
                                 (local.set $sign1 (i64.const -1))
                                 (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
                                 (br $done1)
                             )
                         )
-                        (if (i32.ge_u (i32.load8_u (local.get $ptr)) (i32.const 48))
-                            (if (i32.le_u (i32.load8_u (local.get $ptr)) (i32.const 57))
-                                (then (br $done1))
-                            )
+                        (if (i32.and
+                                (i32.ge_u (local.get $ch) (i32.const 48))
+                                (i32.le_u (local.get $ch) (i32.const 57)))
+                            (then (br $done1))
                         )
                         (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
                         (br $skip1)
                     )
                 )
-
-                ;; Read digits for val1
                 (block $done_val1
                     (loop $loop_val1
                         (br_if $done_val1 (i32.ge_u (local.get $ptr) (local.get $end)))
-                        (if (i32.ge_u (i32.load8_u (local.get $ptr)) (i32.const 48))
-                            (if (i32.le_u (i32.load8_u (local.get $ptr)) (i32.const 57))
-                                (then
-                                    (local.set $val1 
-                                        (i64.add 
-                                            (i64.mul (local.get $val1) (i64.const 10))
-                                            (i64.extend_i32_u (i32.sub (i32.load8_u (local.get $ptr)) (i32.const 48)))
-                                        )
+                        (local.set $ch (i32.load8_u (local.get $ptr)))
+                        (if (i32.and
+                                (i32.ge_u (local.get $ch) (i32.const 48))
+                                (i32.le_u (local.get $ch) (i32.const 57)))
+                            (then
+                                (local.set $val1 
+                                    (i64.add 
+                                        (i64.mul (local.get $val1) (i64.const 10))
+                                        (i64.extend_i32_u (i32.sub (local.get $ch) (i32.const 48)))
                                     )
-                                    (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
-                                    (br $loop_val1)
                                 )
+                                (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
+                                (br $loop_val1)
                             )
                         )
                         (br $done_val1)
@@ -135,45 +135,44 @@ impl PythonCompiler {
                 )
                 (local.set $val1 (i64.mul (local.get $val1) (local.get $sign1)))
 
-                ;; Parse second integer
+                ;; Parse second integer (sign + digits)
                 (local.set $sign2 (i64.const 1))
-                ;; Skip whitespace
                 (block $done2
                     (loop $skip2
                         (br_if $done2 (i32.ge_u (local.get $ptr) (local.get $end)))
-                        (if (i32.eq (i32.load8_u (local.get $ptr)) (i32.const 45)) ;; '-'
+                        (local.set $ch (i32.load8_u (local.get $ptr)))
+                        (if (i32.eq (local.get $ch) (i32.const 45))
                             (then
                                 (local.set $sign2 (i64.const -1))
                                 (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
                                 (br $done2)
                             )
                         )
-                        (if (i32.ge_u (i32.load8_u (local.get $ptr)) (i32.const 48))
-                            (if (i32.le_u (i32.load8_u (local.get $ptr)) (i32.const 57))
-                                (then (br $done2))
-                            )
+                        (if (i32.and
+                                (i32.ge_u (local.get $ch) (i32.const 48))
+                                (i32.le_u (local.get $ch) (i32.const 57)))
+                            (then (br $done2))
                         )
                         (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
                         (br $skip2)
                     )
                 )
-
-                ;; Read digits for val2
                 (block $done_val2
                     (loop $loop_val2
                         (br_if $done_val2 (i32.ge_u (local.get $ptr) (local.get $end)))
-                        (if (i32.ge_u (i32.load8_u (local.get $ptr)) (i32.const 48))
-                            (if (i32.le_u (i32.load8_u (local.get $ptr)) (i32.const 57))
-                                (then
-                                    (local.set $val2 
-                                        (i64.add 
-                                            (i64.mul (local.get $val2) (i64.const 10))
-                                            (i64.extend_i32_u (i32.sub (i32.load8_u (local.get $ptr)) (i32.const 48)))
-                                        )
+                        (local.set $ch (i32.load8_u (local.get $ptr)))
+                        (if (i32.and
+                                (i32.ge_u (local.get $ch) (i32.const 48))
+                                (i32.le_u (local.get $ch) (i32.const 57)))
+                            (then
+                                (local.set $val2 
+                                    (i64.add 
+                                        (i64.mul (local.get $val2) (i64.const 10))
+                                        (i64.extend_i32_u (i32.sub (local.get $ch) (i32.const 48)))
                                     )
-                                    (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
-                                    (br $loop_val2)
                                 )
+                                (local.set $ptr (i32.add (local.get $ptr) (i32.const 1)))
+                                (br $loop_val2)
                             )
                         )
                         (br $done_val2)

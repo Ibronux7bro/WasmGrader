@@ -2,13 +2,11 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::Json;
-use std::sync::Arc;
-
 use moodle_wasm_common::{
     CompilationResult, EvaluationRequest, EvaluationResponse,
 };
 use moodle_wasm_compiler::get_compiler;
-use moodle_wasm_engine::{ParallelTestExecutor, WasmSandboxEngine};
+use moodle_wasm_engine::ParallelTestExecutor;
 
 use crate::AppState;
 
